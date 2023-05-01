@@ -3,6 +3,7 @@ from settings import *
 from entries_frame import EntriesFrame
 from image_frame import LayoutDisplay
 from info_frame import InfoPanel, BottomSliderPanel
+from data_retriever import Data
 
 # Import Windows dynamic link library and C data type converter libraries.
 try:
@@ -19,6 +20,9 @@ class App(ctk.CTk):
         self.iconbitmap('empty.ico')
         self.title('')
         self.change_title_bar_color()
+
+        # initialize
+        Data()
 
         # layout
         self.rowconfigure(0, weight=6, uniform='a')
