@@ -9,7 +9,7 @@ class Panel(ctk.CTkFrame):
         super().__init__(master=parent, fg_color=color, corner_radius=0)
         self.grid(row=row, column=col, columnspan=span, sticky='nsew')
 
-        # widgets
+        # Widgets
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=2 if text == 'Space Efficiency' else 1, uniform='a')
         self.columnconfigure(1, weight=1, uniform='a')
@@ -30,14 +30,14 @@ class InfoPanel(ctk.CTkFrame):
         super().__init__(master=parent, fg_color='transparent')
         self.grid(row=0, rowspan=2, column=2, sticky='nsew')
 
-        # layout
+        # Layout
         self.rowconfigure((1, 3, 5, 7), weight=1, uniform='b')
         self.rowconfigure((0, 2, 4, 6), weight=2, uniform='b')
         self.rowconfigure(8, weight=5, uniform='b')
         self.columnconfigure(0, weight=1, uniform='b')
         self.columnconfigure(1, weight=1, uniform='b')
 
-        # widgets
+        # Widgets
         ConstructionCostPanel(self, PANEL_BG_COLOR, 0, 0, 2)
         Panel(self, PANEL_BG_COLOR, 2, 0, 1, 'Size', '27x27')
         Panel(self, PANEL_BG_COLOR, 2, 1, 1, 'Tiles', '729')
@@ -51,14 +51,14 @@ class ConstructionCostPanel(ctk.CTkFrame):
         super().__init__(master=parent, fg_color=color, corner_radius=0)
         self.grid(row=row, column=col, columnspan=span, sticky='nsew')
 
-        # layout
+        # Layout
         self.rowconfigure((0, 1, 2), weight=1, uniform='a')
         self.columnconfigure(0, weight=7, uniform='a')
         self.columnconfigure((1, 4, 7), weight=2, uniform='a')
         self.columnconfigure((2, 5, 8), weight=6, uniform='a')
         self.columnconfigure((3, 6), weight=1, uniform='a')
 
-        # widgets
+        # Widgets
         ctk.CTkLabel(
             self,
             text=f'Costs:',
@@ -202,18 +202,18 @@ class BottomSliderPanel(ctk.CTkFrame):
 
         self.place(relx=0.26, rely=self.start_pos, relwidth=0.48, relheight=self.height)
 
-        # layout
+        # Layout
         self.rowconfigure((0, 1), weight=5, uniform='a')
         self.rowconfigure(2, weight=1, uniform='a')
         self.rowconfigure((3, 4), weight=4, uniform='a')
         self.columnconfigure((0, 3, 6), weight=1, uniform='a')
         self.columnconfigure((1, 2, 4, 5), weight=4, uniform='a')
 
-        # data
+        # Data
         self.width_entry_var = ctk.StringVar()
         self.height_entry_var = ctk.StringVar()
 
-        # widgets
+        # Widgets
         ctk.CTkLabel(
             master=self,
             text='Enter The Max Dimension Parameters',

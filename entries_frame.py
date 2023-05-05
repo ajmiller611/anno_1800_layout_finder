@@ -7,12 +7,12 @@ class EntriesFrame(ctk.CTkFrame):
         super().__init__(master=parent, fg_color=WINDOW_BG_COLOR)
         self.grid(row=row, rowspan=2, column=col, sticky='nsew')
 
-        # layout
+        # Layout
         self.rowconfigure(0, weight=5, uniform='a')
         self.rowconfigure(1, weight=1, uniform='a')
         self.columnconfigure(0, weight=1, uniform='a')
 
-        # widgets
+        # Widgets
         ListEntryPanel(self)
         SortByPanel(self)
 
@@ -26,7 +26,7 @@ class ListEntryPanel(ctk.CTkScrollableFrame):
             scrollbar_button_hover_color=SCROLLBAR_HOVER_COLOR)
         self.grid(row=0, column=0, sticky='nsew')
 
-        # widgets
+        # Widgets
         for index in range(15):
             ctk.CTkFrame(self, fg_color=ENTRY_TEXT_COLOR, height=2).pack(fill='x')
             ListEntry(self)
@@ -38,13 +38,13 @@ class ListEntry(ctk.CTkFrame):
         super().__init__(master=parent, fg_color='transparent', corner_radius=0)
         self.pack(fill='both')
 
-        # layout
+        # Layout
         self.rowconfigure((0, 1), weight=1, uniform='a')
         self.columnconfigure((0, 2), weight=2, uniform='a')
         self.columnconfigure(1, weight=1, uniform='a')
         self.columnconfigure(3, weight=2, uniform='a')
 
-        # widgets
+        # Widgets
         self.production_line = ctk.CTkLabel(
             master=self,
             text='Schnapps',
@@ -97,15 +97,15 @@ class SortByPanel(ctk.CTkFrame):
         super().__init__(master=parent, fg_color=PANEL_BG_COLOR, corner_radius=0)
         self.grid(row=1, column=0, sticky='nsew')
 
-        # layout
+        # Layout
         self.rowconfigure((0, 1, 2), weight=1, uniform='a')
         self.columnconfigure((0, 2), weight=1, uniform='a')
         self.columnconfigure(1, weight=8, uniform='a')
 
-        # data
+        # Data
         checkbox_state = ctk.StringVar()
 
-        # widgets
+        # Widgets
         self.sort_by_label = ctk.CTkLabel(
             master=self,
             text='Sort Entries By:',

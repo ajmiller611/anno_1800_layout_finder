@@ -1,9 +1,8 @@
 import customtkinter as ctk
 from settings import *
-from entries_frame import EntriesFrame
-from image_frame import LayoutDisplay
-from info_frame import InfoPanel, BottomSliderPanel
 from data_retriever import Data
+from main_frames import InitializingFrame, LayoutFinderFrame
+from threading import Thread
 
 # Import Windows dynamic link library and C data type converter libraries.
 try:
@@ -21,44 +20,42 @@ class App(ctk.CTk):
         self.title('')
         self.change_title_bar_color()
 
-        # initialize
-        Data()
+        # Setup and extract data by web scrapping.
+        self.initializing_text_var = ctk.StringVar(value='Setting up the driver...')
+        self.progress_var = ctk.DoubleVar(value=0)
+        self.data = Data()
 
-        # layout
-        self.rowconfigure(0, weight=6, uniform='a')
-        self.rowconfigure(1, weight=2, uniform='a')
-        self.columnconfigure(0, weight=3, uniform='a')
-        self.columnconfigure(2, weight=3, uniform='a')
-        self.columnconfigure(1, weight=6, uniform='a')
+        # Create a new thread for data extracting process.
+        self.data_thread = Thread(target=self.data.driver_setup, args=(self.progress_var,))
+        self.data_thread.start()
+        self.monitor(self.data_thread, 'driver')
 
-        # widgets
-        EntriesFrame(self, 0, 0)
-        LayoutDisplay(self)
-        InfoPanel(self)
-        self.top_slide_panel = BottomSliderPanel(self, self.update_button_text)
-        self.button = ctk.CTkButton(
-            self,
-            command=self.top_slide_panel.animate,
-            text='\u02C5',
-            text_color=PANEL_TEXT_COLOR,
-            font=ctk.CTkFont(family=FONT_FAMILY, size=BUTTON_TEXT_SIZE),
-            corner_radius=0,
-            fg_color=BUTTON_FG_COLOR,
-            hover_color=BUTTON_HOVER_COLOR,
-            border_width=3,
-            border_color=PANEL_TEXT_COLOR,
-            bg_color=PANEL_TEXT_COLOR,
-            width=50,
-            height=20)
-        self.button.place(relx=0.475, rely=0.975, relwidth=0.05, relheight=0.05)
+        # Widgets
+        self.initializing_frame = InitializingFrame(self, self.initializing_text_var, self.progress_var)
 
-        self.mainloop()
+    def monitor(self, thread, classification):
+        # Monitor the data thread for when the task has been completed.
+        if thread.is_alive():
+            self.after(50, lambda: self.monitor(thread, classification))
 
-    def update_button_text(self, *args):
-        if self.button.cget('text') == '\u02C5':
-            self.button.configure(text='\u02C4')  # unicode for the modifier letter up arrowhead
-        else:
-            self.button.configure(text='\u02C5')  # unicode for the modifier letter down arrowhead
+        elif classification == 'driver':
+            self.progress_var.set(0)
+            self.initializing_text_var.set('Extracting data elements...')
+            self.data_thread = Thread(target=self.data.extract_data_elements, args=(self.progress_var,))
+            self.data_thread.start()
+            self.monitor(self.data_thread, 'elements')
+
+        elif classification == 'elements':
+            self.progress_var.set(0)
+            self.initializing_text_var.set('Extracting layout images...')
+            self.data_thread = Thread(target=self.data.extract_images, args=(self.progress_var,))
+            self.data_thread.start()
+            self.monitor(self.data_thread, 'images')
+
+        elif classification == 'images':
+            self.data.create_data_frame()
+            self.initializing_frame.pack_forget()
+            LayoutFinderFrame(self)
 
     def get_screen_offset(self):
         # On startup, find offset to center the window on the screen.
@@ -84,4 +81,5 @@ class App(ctk.CTk):
 
 
 if __name__ == '__main__':
-    App()
+    app = App()
+    app.mainloop()

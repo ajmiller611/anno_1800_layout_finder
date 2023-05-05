@@ -1,7 +1,7 @@
 WINDOW_SIZE = (1440, 900)
 TITLE_BAR_HEX_COLOR = 0x00BBD9E7
 
-# general theme colors and sizes
+# General theme colors and sizes
 WINDOW_BG_COLOR = '#E7D9BB'
 PANEL_BG_COLOR = '#242025'
 PANEL_TEXT_COLOR = '#E7D9BB'
@@ -10,17 +10,16 @@ FONT_FAMILY = 'Rockwell'
 TITLE_FONT_SIZE = 24
 INFO_FONT_SIZE = 18
 
-# entries list
+# Entries list
 ENTRY_TEXT_COLOR = '#4F300F'
 SCROLLBAR_HOVER_COLOR = '#855119'
 
-# sorting checkbox panel
+# Sorting checkbox panel
 SORT_CHECKBOX_HIGHLIGHT_COLOR = '#A3926F'
 SORT_CHECKBOX_TITLE_FONT_SIZE = 28
 SORT_CHECKBOX_FONT_SIZE = 20
 
-
-# buttons
+# Buttons
 BUTTON_FG_COLOR = '#584869'
 BUTTON_HOVER_COLOR = '#443852'
 BUTTON_TEXT_SIZE = 24
