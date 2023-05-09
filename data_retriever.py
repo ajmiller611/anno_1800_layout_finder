@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 import urllib.request
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -55,9 +56,10 @@ class Data:
 
             return data_string
 
-        # The layout name is in a <p> tag with an inline <span> tag all with the same style.
+        # The layout name is in a <p> tag with an inline <span> tag all with the same style. This style was used to
+        # identify where the layout names were in the HTML. Then format the names to a more readable name.
         for name in self.soup.find_all(attrs={'style': 'font-size:125%'}):
-            self.layout_names.append(name.find('b').text)
+            self.layout_names.append(self.format_name_text(name.find('b').text))
 
         # The extract data elements logic is separated into five parts for the progress bar.
         progress_var.set(progress_var.get() + 0.20)
@@ -103,6 +105,20 @@ class Data:
                     for produce_type in cell.find_all('img'):
                         produce_data_string = produce_type.get('alt')
                         produce_data_string = produce_data_string.split('.')[0]
+
+                        # Some of the types are more than one word. The format of the types names need to be consistent.
+                        # Inconsistencies in the data occurred with the second word. Capitalizing the first letter of
+                        # the second word and joining them with an underscore was the format used.
+                        words_list = produce_data_string.split(' ')
+                        if len(words_list) > 1:
+                            words_list[1] = words_list[1][0].upper() + words_list[1][1:]
+                            produce_data_string = '_'.join(words_list)
+
+                        # In the game, the produced goods are called Wood Veneers that are produced at a marquetry
+                        # factory. The website has them labeled as the building name and not the name of the produced
+                        # goods. The mistake is corrected here for overall consistency in the naming of the goods.
+                        if produce_data_string == 'Marketry':
+                            produce_data_string = 'Wood_Veneers'
                         produce.append(produce_data_string)
                     production_types.append(produce)
 
@@ -125,7 +141,7 @@ class Data:
 
         # At the time of writing this program, one layout on the website had an error with its image but had the other
         # fields of data. Removing this data is needed to keep the lists of data consistent with the image data.
-        bad_data_index = self.layout_names.index('Canned Food 06 WH TU - [Recipe Archivist]')
+        bad_data_index = self.layout_names.index('Canned Food 06')
         self.layout_names.pop(bad_data_index)
         self.costs_info.pop(bad_data_index)
         self.size.pop(bad_data_index)
@@ -133,6 +149,22 @@ class Data:
         self.space_eff.pop(bad_data_index)
         self.production_info.pop(bad_data_index)
         progress_var.set(progress_var.get() + 0.20)
+
+    def format_name_text(self, name):
+        for string_index, char in enumerate(name):
+            # The format of most layout names are like 'Timber 03 WH TU FS' so cutting out everything after the numbers
+            # makes the name of the layout look more readable.
+            if char.isnumeric():
+                formatted_name = name[:string_index + 2]
+                break
+
+            # There is one case where the name doesn't contain numbers since it is the only layout of its kind. Finding
+            # the first instance of two capital letters next to each other will give the index of where to cut the name
+            # for better readability.
+            elif str(char).isupper() and name[string_index + 1].isupper():
+                formatted_name = name[:string_index]
+                break
+        return formatted_name
 
     def extract_images(self, progress_var=None):
         # Find the image information in the HTML.

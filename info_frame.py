@@ -149,7 +149,7 @@ class ConstructionCostPanel(ctk.CTkFrame):
     def middle_dot_separator(self, parent, row, col):
         ctk.CTkLabel(
             master=parent,
-            text='\u00B7',
+            text='\u00B7',  # Unicode for middle dot character.
             text_color=PANEL_TEXT_COLOR,
             font=ctk.CTkFont(family=FONT_FAMILY, size=TITLE_FONT_SIZE)).grid(row=row, column=col, sticky='nsew')
 
