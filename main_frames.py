@@ -1,6 +1,8 @@
 import customtkinter as ctk
+import pandas as pd
 from tkinter import Canvas
 from settings import *
+from data_retriever import convert_data_entry_to_dict
 from entries_frame import EntriesFrame
 from image_frame import LayoutDisplay
 from info_frame import InfoPanel, BottomSliderPanel
@@ -12,7 +14,7 @@ class InitializingFrame(ctk.CTkFrame):
         super().__init__(master=parent, fg_color=WINDOW_BG_COLOR)
         self.pack(expand=True, fill='both')
 
-        self.original_image = Image.open('images/Anno1800_Wallpaper_City_Lights_1920_1080.jpg')
+        self.original_image = Image.open(INITIALIZING_FRAME_BG_IMAGE_PATH)
         self.image = self.original_image
         self.image_ratio = self.image.size[0] / self.image.size[1]
         self.image_tk = ImageTk.PhotoImage(self.image)
@@ -61,15 +63,24 @@ class LayoutFinderFrame(ctk.CTkFrame):
         self.columnconfigure(2, weight=3, uniform='a')
         self.columnconfigure(1, weight=6, uniform='a')
 
-        # Widgets
-        EntriesFrame(self, 0, 0)
-        LayoutDisplay(self)
-        InfoPanel(self)
+        data = pd.read_csv('layout_data.csv')
+
+        # Create the widgets with all layouts in the entries list and the first layout as the initial data displayed.
+        self.entries_frame = EntriesFrame(self, data, self.update_layout_image_display, self.update_info_panel)
+        self.layout_image_display = LayoutDisplay(self, data.iloc[0]['Image'])
+        self.info_panel = InfoPanel(
+            self,
+            convert_data_entry_to_dict(data.iloc[0]['Cost']),
+            data.iloc[0]['Size'] if not pd.isna(data.iloc[0]['Size']) else 'N/A',
+            data.iloc[0]['Tiles'] if not pd.isna(data.iloc[0]['Tiles']) else 'N/A',
+            data.iloc[0]['Space Efficiency'] if not pd.isna(data.iloc[0]['Space Efficiency']) else 'N/A',
+            convert_data_entry_to_dict(data.iloc[0]['Production']))
+
         self.top_slide_panel = BottomSliderPanel(self, self.update_button_text)
         self.button = ctk.CTkButton(
             self,
             command=self.top_slide_panel.animate,
-            text='\u02C5',
+            text='\u02C5',  # Unicode for the modifier letter down arrowhead
             text_color=PANEL_TEXT_COLOR,
             font=ctk.CTkFont(family=FONT_FAMILY, size=BUTTON_TEXT_SIZE),
             corner_radius=0,
@@ -81,6 +92,28 @@ class LayoutFinderFrame(ctk.CTkFrame):
             width=50,
             height=20)
         self.button.place(relx=0.475, rely=0.975, relwidth=0.05, relheight=0.05)
+
+    def update_layout_image_display(self, image_path):
+        self.layout_image_display.original = Image.open(image_path)
+        self.layout_image_display.image = self.layout_image_display.original
+        self.layout_image_display.image_ratio = \
+            self.layout_image_display.image.size[0] / self.layout_image_display.image.size[1]
+
+        self.layout_image_display.image_tk = ImageTk.PhotoImage(self.layout_image_display.image)
+
+        if self.layout_image_display.canvas_ratio > self.layout_image_display.image_ratio:
+            self.layout_image_display.image_height = int(self.layout_image_display.canvas_height)
+            self.layout_image_display.image_width = int(self.layout_image_display.image_height
+                                                        * self.layout_image_display.image_ratio)
+        else:
+            self.layout_image_display.image_width = int(self.layout_image_display.canvas_width)
+            self.layout_image_display.image_height = int(self.layout_image_display.image_width
+                                                         / self.layout_image_display.image_ratio)
+
+        self.layout_image_display.place_image()
+
+    def update_info_panel(self, cost, size, tiles, space_eff, production):
+        self.info_panel.update_info_data_display(cost, size, tiles, space_eff, production)
 
     def update_button_text(self, *args):
         if self.button.cget('text') == '\u02C5':

@@ -1,14 +1,15 @@
+import pandas as pd
 from tkinter import Canvas
 from settings import *
 from PIL import Image, ImageTk
 
 
 class LayoutDisplay(Canvas):
-    def __init__(self, parent):
+    def __init__(self, parent, image_path):
         super().__init__(master=parent, background=WINDOW_BG_COLOR, bd=0, highlightthickness=0, relief='ridge')
-        self.grid(row=0, column=1, sticky='nsew', padx=8)
+        self.grid(row=0, rowspan=2, column=1, sticky='nsew', padx=8)
 
-        self.original = Image.open('images/Potato_Farm_with_Tractor_Barn.jpg')
+        self.original = Image.open(image_path)
         self.image = self.original
         self.image_ratio = self.image.size[0] / self.image.size[1]
         self.image_tk = ImageTk.PhotoImage(self.image)
@@ -16,12 +17,12 @@ class LayoutDisplay(Canvas):
         self.bind('<Configure>', self.resize_image)
 
     def resize_image(self, event):
-        canvas_ratio = event.width / event.height
+        self.canvas_ratio = event.width / event.height
 
         self.canvas_width = event.width
         self.canvas_height = event.height
 
-        if canvas_ratio > self.image_ratio:
+        if self.canvas_ratio > self.image_ratio:
             self.image_height = int(event.height)
             self.image_width = int(self.image_height * self.image_ratio)
         else:
